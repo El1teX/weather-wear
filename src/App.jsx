@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import CitySearch, { cityLabel } from './components/CitySearch';
 import CurrentWeather from './components/CurrentWeather';
+import ClothingAdvice from './components/ClothingAdvice';
 import { useWeather } from './hooks/useWeather';
 import { skyTheme } from './utils/weatherCodes';
 
@@ -40,13 +41,16 @@ export default function App() {
       )}
 
       {weather && (
-        <CurrentWeather
-          cityName={cityLabel(city)}
-          weather={weather}
-          updatedAt={updatedAt}
-          onRefresh={refresh}
-          refreshing={status === 'loading'}
-        />
+        <>
+          <CurrentWeather
+            cityName={cityLabel(city)}
+            weather={weather}
+            updatedAt={updatedAt}
+            onRefresh={refresh}
+            refreshing={status === 'loading'}
+          />
+          <ClothingAdvice weather={weather} />
+        </>
       )}
 
       <footer className="footer">
