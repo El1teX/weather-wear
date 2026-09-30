@@ -1,35 +1,64 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { getItem, setItem } from '../utils/storage';
 
-const STORAGE_KEY = 'weather-wear:city';
+const CITY_KEY = 'weather_wear_city';
+const RECENTS_KEY = 'weather_wear_recents';
+const MAX_RECENTS = 5;
 
-function readSaved() {
+const isCity = (c) =>
+  c && typeof c.name === 'string' && Number.isFinite(c.latitude) && Number.isFinite(c.longitude);
+
+function parse(raw, fallback) {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-    const city = JSON.parse(raw);
-    const valid =
-      city &&
-      typeof city.name === 'string' &&
-      Number.isFinite(city.latitude) &&
-      Number.isFinite(city.longitude);
-    return valid ? city : null;
+    return raw ? JSON.parse(raw) : fallback;
   } catch {
-    return null;
+    return fallback;
   }
 }
 
-/** Выбранный город, который сохраняется между визитами. */
+// Храним только нужные поля, чтобы укладываться в лимиты CloudStorage.
+const compact = ({ id, name, admin1, country, latitude, longitude }) => ({
+  id, name, admin1, country, latitude, longitude,
+});
+
+const sameCity = (a, b) =>
+  Math.abs(a.latitude - b.latitude) < 0.01 && Math.abs(a.longitude - b.longitude) < 0.01;
+
+/** Выбранный город и недавние города. Сохраняются между запусками. */
 export function useSavedCity() {
-  const [city, setCity] = useState(readSaved);
+  const [state, setState] = useState({ ready: false, city: null, recents: [] });
 
   useEffect(() => {
-    if (!city) return;
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(city));
-    } catch {
-      // Хранилище недоступно (приватный режим) — просто не запоминаем.
-    }
-  }, [city]);
+    let alive = true;
+    Promise.all([getItem(CITY_KEY), getItem(RECENTS_KEY)]).then(([rawCity, rawRecents]) => {
+      if (!alive) return;
+      const city = parse(rawCity, null);
+      const recents = parse(rawRecents, []);
+      setState({
+        ready: true,
+        city: isCity(city) ? city : null,
+        recents: Array.isArray(recents) ? recents.filter(isCity) : [],
+      });
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
 
-  return [city, setCity];
+  const setCity = useCallback((next) => {
+    const city = compact(next);
+    setState((s) => {
+      const recents = [city, ...s.recents.filter((c) => !sameCity(c, city))].slice(0, MAX_RECENTS);
+      return { ...s, city, recents };
+    });
+  }, []);
+
+  // Сохраняем после обновления состояния
+  useEffect(() => {
+    if (!state.ready || !state.city) return;
+    setItem(CITY_KEY, JSON.stringify(state.city));
+    setItem(RECENTS_KEY, JSON.stringify(state.recents));
+  }, [state]);
+
+  return { ...state, setCity };
 }
