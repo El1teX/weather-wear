@@ -1,324 +1,587 @@
+/* ==========================================================
+   Что надеть — стили
+   Верх экрана: живое небо под погоду (цвета из src/utils/sky.js).
+   Низ: шторка в цветах темы Telegram (переменные --tg-theme-*
+   задаёт telegram-web-app.js; вне Telegram работают запасные цвета).
+   ========================================================== */
+
 :root {
-  --font-display: 'Unbounded', 'Arial Black', system-ui, sans-serif;
-  --font-body: 'Onest', 'Segoe UI', system-ui, -apple-system, sans-serif;
-  --bg: #d9e4ea;
-  --ink: #1a2a36;
-  --ink-soft: color-mix(in srgb, var(--ink) 65%, transparent);
-  --line: color-mix(in srgb, var(--ink) 18%, transparent);
-  --accent: #f2b233;
+  --font-display: 'Nunito', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-body: 'Nunito', 'Segoe UI', system-ui, -apple-system, sans-serif;
+
+  --bg: var(--tg-theme-bg-color, #ffffff);
+  --ink: var(--tg-theme-text-color, #16202a);
+  --hint: var(--tg-theme-hint-color, #66727f);
+  --tile: var(--tg-theme-secondary-bg-color, #eff3f6);
+  --accent: var(--tg-theme-button-color, #2474c9);
+  --accent-ink: var(--tg-theme-button-text-color, #ffffff);
+  --link: var(--tg-theme-link-color, #2474c9);
+  --sun: #f5b83d;
+
+  --safe-top: calc(
+    var(--tg-safe-area-inset-top, env(safe-area-inset-top, 0px)) +
+      var(--tg-content-safe-area-inset-top, 0px)
+  );
+  --safe-bottom: calc(
+    var(--tg-safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)) +
+      var(--tg-content-safe-area-inset-bottom, 0px)
+  );
+
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: var(--tg-theme-bg-color, #14181d);
+    --ink: var(--tg-theme-text-color, #edf1f5);
+    --hint: var(--tg-theme-hint-color, #8f9aa6);
+    --tile: var(--tg-theme-secondary-bg-color, #1f252c);
+    --accent: var(--tg-theme-button-color, #3d8fe0);
+    --link: var(--tg-theme-link-color, #6db0f2);
+  }
 }
 
 *, *::before, *::after { box-sizing: border-box; }
 
-html, body { margin: 0; min-height: 100%; }
-
-/* Цвет неба под текущую погоду. Задаётся атрибутом data-sky на <html>. */
-:root[data-sky='clear']  { --bg: #9fcbef; --ink: #0e2a47; --accent: #f2b233; }
-:root[data-sky='clouds'] { --bg: #b9c4cd; --ink: #1c2a35; --accent: #ffffff; }
-:root[data-sky='rain']   { --bg: #5f7488; --ink: #eef3f7; --accent: #a8d8ff; }
-:root[data-sky='snow']   { --bg: #e8eff4; --ink: #1f3140; --accent: #5aa6d6; }
-:root[data-sky='storm']  { --bg: #373d52; --ink: #f1eee4; --accent: #ffd54a; }
-:root[data-sky='fog']    { --bg: #d0d0c9; --ink: #2a2a26; --accent: #6b6b61; }
-:root[data-sky='night']  { --bg: #1b2440; --ink: #e6ebf6; --accent: #f5d77a; }
+html, body { margin: 0; }
 
 body {
-  transition: background-color 1.2s ease, color 1.2s ease;
   font-family: var(--font-body);
   font-size: 1.0625rem;
-  line-height: 1.55;
+  font-weight: 600;
+  line-height: 1.5;
   color: var(--ink);
   background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.page {
-  max-width: 44rem;
-  margin: 0 auto;
-  padding: clamp(1.5rem, 5vw, 3.5rem) clamp(1.25rem, 5vw, 2rem) 4rem;
-}
+body.no-scroll { overflow: hidden; }
 
-.title {
-  font-family: var(--font-display);
-  font-weight: 500;
-  font-size: 1.25rem;
-  letter-spacing: -0.01em;
-  margin: 0;
-}
+button { font: inherit; color: inherit; cursor: pointer; }
+button:disabled { cursor: default; }
 
-
-/* ---------- Шапка и поиск ---------- */
-
-.header {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 1rem 2rem;
-  margin-bottom: clamp(2rem, 6vw, 4rem);
-}
-
-.search { position: relative; flex: 1 1 16rem; max-width: 22rem; }
-
-.search__label {
-  display: block;
-  font-size: 0.875rem;
-  color: var(--ink-soft);
-  margin-bottom: 0.25rem;
-}
-
-.search__input {
-  width: 100%;
-  font: inherit;
-  color: var(--ink);
-  background: transparent;
-  border: 0;
-  border-bottom: 2px solid var(--ink);
-  padding: 0.35rem 0;
-  border-radius: 0;
-}
-
-.search__input::placeholder { color: var(--ink-soft); }
-
-.search__input:focus-visible {
+:focus-visible {
   outline: 3px solid var(--accent);
-  outline-offset: 4px;
+  outline-offset: 2px;
 }
 
-.search__hint {
-  position: absolute;
-  right: 0;
-  top: 0;
-  font-size: 0.875rem;
-  color: var(--ink-soft);
-}
-
-.search__hint--error { position: static; display: block; margin-top: 0.4rem; }
-
-.search__geo {
-  display: inline-block;
-  margin-top: 0.6rem;
-  font-size: 0.875rem;
-  color: var(--ink-soft);
-}
-
-.search__geo:hover:not(:disabled) { color: var(--ink); }
-
-.search__list {
-  position: absolute;
-  z-index: 10;
-  left: 0;
-  right: 0;
-  top: calc(100% + 0.5rem);
-  margin: 0;
-  padding: 0.35rem;
-  list-style: none;
-  background: #fbfcfd;
-  color: #1a2a36;
-  border-radius: 10px;
-  box-shadow: 0 12px 32px -12px rgba(10, 30, 50, 0.45);
-}
-
-.search__option,
-.search__empty {
-  padding: 0.55rem 0.7rem;
-  border-radius: 6px;
-}
-
-.search__option { cursor: pointer; }
-.search__option.is-active { background: #e6eef4; }
-.search__empty { color: #56636d; }
-
-/* ---------- Текущая погода ---------- */
-
-.empty, .error {
-  font-size: 1.25rem;
-  line-height: 1.45;
-  max-width: 30ch;
-  color: var(--ink-soft);
-}
-
-.error { color: var(--ink); max-width: 40ch; font-size: 1.0625rem; }
-
-.now__city {
-  font-family: var(--font-body);
-  font-weight: 500;
-  font-size: 1.0625rem;
-  color: var(--ink-soft);
-  margin: 0;
-}
-
-.now__main {
+.app {
+  max-width: 560px;
+  margin: 0 auto;
+  min-height: 100vh;
+  min-height: var(--tg-viewport-stable-height, 100dvh);
   display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  gap: 0.5rem 1.5rem;
+  flex-direction: column;
 }
 
-.now__temp {
+/* ---------- Небо ---------- */
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  min-height: clamp(410px, 58vh, 520px);
+  color: var(--sky-ink);
+  background: linear-gradient(180deg, var(--sky-top) 0%, var(--sky-bottom) 100%);
+  display: flex;
+}
+
+.hero__content {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 24px;
+  padding: calc(var(--safe-top) + 14px) 20px 52px;
+  text-shadow: var(--sky-shadow);
+}
+
+.hero__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.glass-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 14px;
+  border: 1.5px solid rgba(255, 255, 255, 0.55);
+  border-radius: 999px;
+  color: var(--sky-ink);
+  background: rgba(255, 255, 255, 0.32);
+  -webkit-backdrop-filter: blur(14px) saturate(1.5);
+  backdrop-filter: blur(14px) saturate(1.5);
+  box-shadow: 0 6px 18px -8px rgba(20, 30, 70, 0.35);
+  text-shadow: none;
+  transition: background-color 0.2s, transform 0.35s var(--spring);
+}
+
+.glass-btn:active { transform: scale(0.9); background: rgba(255, 255, 255, 0.45); }
+
+.city-btn { max-width: 75%; font-weight: 800; font-size: 1.0625rem; }
+.city-btn__name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.icon-btn { width: 42px; padding: 0; justify-content: center; }
+.icon-btn.is-spinning svg { animation: spin 0.9s linear infinite; }
+
+.hero__temp {
   font-family: var(--font-display);
-  font-weight: 300;
-  font-size: clamp(6rem, 24vw, 13rem);
-  line-height: 0.9;
-  letter-spacing: -0.06em;
-  margin: 0.1em 0 0 -0.04em;
+  font-weight: 900;
+  font-size: clamp(5.5rem, 26vw, 8rem);
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  margin: 0 0 6px -0.03em;
   font-variant-numeric: tabular-nums;
 }
 
-.now__deg { font-weight: 300; color: var(--accent); }
-
-.now__summary { padding-bottom: 0.9rem; }
-
-.now__condition {
+.hero__condition {
   font-family: var(--font-display);
-  font-weight: 500;
-  font-size: clamp(1.25rem, 3.5vw, 1.625rem);
-  line-height: 1.2;
-  margin: 0;
-}
-
-.now__range { margin: 0.3rem 0 0; color: var(--ink-soft); }
-
-.now__details {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr));
-  gap: 1rem 1.5rem;
-  margin: 2rem 0 0;
-  padding: 1.25rem 0;
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-}
-
-.now__details dt { font-size: 0.875rem; color: var(--ink-soft); }
-.now__details dd { margin: 0.15rem 0 0; font-size: 1.25rem; font-weight: 500; }
-.now__details small { font-size: 0.875rem; font-weight: 400; color: var(--ink-soft); }
-
-.now__updated { margin: 1rem 0 0; font-size: 0.875rem; color: var(--ink-soft); }
-
-.link-btn {
-  font: inherit;
-  color: var(--ink);
-  background: none;
-  border: 0;
-  padding: 0;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  cursor: pointer;
-}
-
-.link-btn:disabled { cursor: default; opacity: 0.6; }
-
-.link-btn:focus-visible,
-a:focus-visible {
-  outline: 3px solid var(--accent);
-  outline-offset: 3px;
-  border-radius: 2px;
-}
-
-/* ---------- Пожелание на день ---------- */
-
-.wish {
-  margin-top: clamp(2.5rem, 7vw, 3.5rem);
-  max-width: 36rem;
-}
-
-.wish__label {
-  font-family: var(--font-body);
-  font-weight: 500;
-  font-size: 0.875rem;
-  color: var(--ink-soft);
-  margin: 0 0 0.5rem;
-}
-
-.wish__text {
-  font-family: var(--font-display);
-  font-weight: 300;
-  font-size: clamp(1.25rem, 3.6vw, 1.625rem);
-  line-height: 1.35;
-  letter-spacing: -0.01em;
-  margin: 0;
-  text-wrap: pretty;
-}
-
-.wish__greeting { font-weight: 500; }
-
-/* ---------- Что надеть ---------- */
-
-.wear { margin-top: clamp(3rem, 8vw, 4.5rem); }
-
-.section-title {
-  font-family: var(--font-display);
-  font-weight: 500;
-  font-size: clamp(1.5rem, 4vw, 2rem);
-  letter-spacing: -0.02em;
+  font-weight: 900;
+  font-size: 1.625rem;
   line-height: 1.15;
   margin: 0;
 }
 
-.wear__lead { margin: 0.4rem 0 0; color: var(--ink-soft); }
+.hero__meta { margin: 6px 0 0; max-width: 30ch; font-weight: 700; }
+.hero__updated { margin: 6px 0 0; font-size: 0.875rem; opacity: 0.8; }
 
-.wear__layers {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
-  gap: 0 2rem;
-  margin-top: 1.5rem;
-  border-top: 1px solid var(--line);
+.hero__content--welcome { justify-content: flex-end; }
+.hero__brand { margin: 0; font-weight: 800; opacity: 0.85; }
+.hero__welcome {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(2rem, 9vw, 2.75rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  margin: 6px 0 0;
+  max-width: 11ch;
 }
 
-.wear__layer {
-  padding: 1rem 0 1.1rem;
-  border-bottom: 1px solid var(--line);
+/* ---------- Сцена (объекты неба) ---------- */
+
+.scene {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  animation: fade-in 1.1s var(--ease-out) both;
 }
 
-.wear__label {
-  font-family: var(--font-body);
-  font-weight: 500;
-  font-size: 0.875rem;
-  color: var(--ink-soft);
-  margin: 0 0 0.35rem;
+.scene-pop { animation: fade-in 1.4s var(--ease-out) both; }
+
+.scene-drift--slow { animation: drift 34s ease-in-out infinite alternate; }
+.scene-drift--medium { animation: drift 22s ease-in-out infinite alternate-reverse; }
+
+.scene-spin {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: spin 90s linear infinite;
 }
 
-.wear__items {
-  list-style: none;
+.scene-twinkle {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: twinkle 2.6s ease-in-out infinite;
+}
+
+.scene-float { animation: float 3.2s ease-in-out infinite alternate; }
+.scene-bob { animation: bob 2.6s ease-in-out infinite alternate; }
+
+.scene-blink {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: blink 4.5s ease-in-out infinite;
+}
+
+.scene-zzz { animation: zzz 3s ease-in-out infinite; }
+
+.scene-spin-fast {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: spin 6s linear infinite;
+}
+
+.scene-birds { animation: birds 16s linear infinite; }
+
+.scene-flap {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: flap 0.5s ease-in-out infinite alternate;
+}
+
+.scene-flap--late { animation-delay: -0.25s; }
+
+.scene-fall { animation: fall 0.8s linear infinite; }
+.scene-snowfall { animation: snowfall 8s linear infinite; }
+.scene-sway { animation: sway 3.2s ease-in-out infinite alternate; }
+
+.scene-flash { opacity: 0; animation: flash 7s linear infinite; }
+.scene-bolt { opacity: 0; animation: flash-bolt 7s linear infinite; }
+
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes drift { from { transform: translateX(-18px); } to { transform: translateX(18px); } }
+@keyframes twinkle {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.45; transform: scale(0.6); }
+}
+@keyframes float { from { transform: translateY(-6px); } to { transform: translateY(6px); } }
+@keyframes bob { from { transform: translateY(-3px); } to { transform: translateY(3px); } }
+@keyframes blink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.1); } }
+@keyframes zzz {
+  0%, 100% { opacity: 0.2; transform: translateY(4px); }
+  50% { opacity: 1; transform: translateY(-4px); }
+}
+@keyframes birds { from { transform: translateX(-60px); } to { transform: translateX(460px); } }
+@keyframes flap { from { transform: scaleY(1); } to { transform: scaleY(0.4); } }
+@keyframes fall {
+  from { transform: translate(16px, -300px); }
+  to { transform: translate(-16px, 300px); }
+}
+@keyframes snowfall {
+  from { transform: translateY(-300px); }
+  to { transform: translateY(300px); }
+}
+@keyframes sway { from { transform: translateX(-7px); } to { transform: translateX(7px); } }
+@keyframes flash {
+  0%, 86%, 89%, 91%, 100% { opacity: 0; }
+  87% { opacity: 0.45; }
+  90% { opacity: 0.3; }
+}
+@keyframes flash-bolt {
+  0%, 86%, 92%, 100% { opacity: 0; }
+  87%, 91% { opacity: 1; }
+}
+
+/* ---------- Шторка с контентом ---------- */
+
+.sheet {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  margin-top: -32px;
+  padding: 28px 20px calc(36px + var(--safe-bottom));
+  border-radius: 32px 32px 0 0;
+  background: var(--bg);
+  animation: sheet-in 0.7s var(--ease-out) both;
+}
+
+@keyframes sheet-in {
+  from { transform: translateY(48px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.sheet__status { margin: 8px 0; color: var(--hint); font-size: 1.0625rem; }
+
+/* Пожелание */
+.wish { margin-bottom: 30px; }
+.wish__greeting {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 4px;
+  font-weight: 900;
+  color: var(--accent);
+}
+
+.wish__emoji {
+  display: inline-block;
+  font-size: 1.5rem;
+  transform-origin: 70% 80%;
+  animation: wave 1.6s 0.6s ease-in-out both;
+}
+
+@keyframes wave {
+  0%, 100% { transform: rotate(0); }
+  15%, 45% { transform: rotate(18deg); }
+  30%, 60% { transform: rotate(-10deg); }
+}
+
+.wish__text {
   margin: 0;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.375rem;
+  line-height: 1.3;
+  text-wrap: pretty;
+}
+
+/* Блоки */
+.block + .block { margin-top: 34px; }
+
+.block__title {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 1.5rem;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.block__lead { margin: 4px 0 0; color: var(--hint); }
+
+/* Что надеть */
+.outfit { display: grid; gap: 16px; margin-top: 16px; }
+.outfit__label { margin: 0 0 8px; font-size: 0.9375rem; font-weight: 800; color: var(--hint); }
+.outfit__items { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px 9px 10px;
+  border-radius: 18px;
+  background: var(--tile);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.3;
+  animation: chip-in 0.55s calc(0.35s + var(--i, 0) * 60ms) var(--spring) both;
+}
+
+.chip__icon { font-size: 1.6rem; line-height: 1; }
+
+@keyframes chip-in {
+  from { opacity: 0; transform: translateY(12px) scale(0.8); }
+  to { opacity: 1; transform: none; }
+}
+
+.notes {
+  display: flex;
+  gap: 12px;
+  margin: 18px 0 0;
+  padding: 14px 16px;
+  border-radius: 20px;
+  background: color-mix(in srgb, #ffc93d 22%, var(--bg));
+  font-size: 1rem;
+}
+
+.notes__icon { font-size: 1.5rem; line-height: 1.2; }
+.notes ul { margin: 0; padding: 0; list-style: none; }
+.notes li + li { margin-top: 6px; }
+
+/* Подробнее */
+.tiles { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 16px; }
+
+.tile {
+  --tone: var(--accent);
+  position: relative;
+  padding: 14px 16px 16px;
+  border-radius: 24px;
+  background: color-mix(in srgb, var(--tone) 17%, var(--bg));
+  min-width: 0;
+}
+
+.tile[data-tone='wind'] { --tone: #2fc79a; }
+.tile[data-tone='rain'] { --tone: #4d9dff; }
+.tile[data-tone='water'] { --tone: #22bcd4; }
+.tile[data-tone='uv'] { --tone: #ffb020; }
+.tile[data-tone='sun'] { --tone: #ff8a5b; }
+
+.tile__emoji {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.tile--wide { grid-column: 1 / -1; }
+.tile__label { margin: 0; font-size: 0.875rem; font-weight: 700; color: var(--hint); }
+.tile__value {
+  margin: 4px 0 0;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 1.75rem;
+  letter-spacing: -0.02em;
+}
+.tile__sub { margin: 0; font-size: 0.9375rem; font-weight: 700; color: var(--hint); }
+
+.meter {
+  height: 6px;
+  margin-top: 10px;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--tone) 25%, transparent);
+  overflow: hidden;
+}
+
+.meter span {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: var(--tone);
+  transform-origin: left;
+  animation: grow 0.9s 0.3s var(--ease-out) both;
+}
+
+@keyframes grow { from { transform: scaleX(0); } }
+
+.sunpath { display: block; width: 100%; height: auto; margin-top: 6px; }
+.sunpath__track { fill: none; stroke: var(--hint); stroke-width: 2.5; stroke-dasharray: 1 7; stroke-linecap: round; opacity: 0.7; }
+.sunpath__done { fill: none; stroke: var(--sun); stroke-width: 5; stroke-linecap: round; }
+.sunpath__horizon { stroke: var(--hint); stroke-width: 1; opacity: 0.4; }
+.sunpath__sun { fill: #ffd84a; stroke: #27304a; stroke-width: 2.5; }
+.sunpath__times { display: flex; justify-content: space-between; font-size: 0.9375rem; font-weight: 700; color: var(--hint); }
+
+.credit { margin: 30px 0 0; font-size: 0.8125rem; color: var(--hint); }
+
+/* ---------- Первый запуск ---------- */
+
+.welcome { display: grid; gap: 10px; }
+.welcome__text { margin: 0 0 8px; font-size: 1.0625rem; max-width: 34ch; }
+
+.primary-btn,
+.secondary-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 52px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 20px;
+  font-weight: 800;
+  font-size: 1.0625rem;
+  transition: transform 0.35s var(--spring), filter 0.2s;
+}
+
+.primary-btn { background: var(--accent); color: var(--accent-ink); }
+.secondary-btn { background: var(--tile); color: var(--ink); }
+.primary-btn:active, .secondary-btn:active { transform: scale(0.94); }
+.primary-btn { box-shadow: 0 8px 20px -10px var(--accent); }
+.primary-btn:disabled, .secondary-btn:disabled { filter: saturate(0.4); opacity: 0.8; }
+
+.notice { margin: 6px 0 0; color: var(--ink); font-size: 0.9375rem; }
+.notice--block { display: grid; gap: 12px; }
+.notice--block p { margin: 0; }
+
+.link-btn {
   padding: 0;
-  font-size: 1.125rem;
-  line-height: 1.45;
+  border: 0;
+  background: none;
+  color: var(--link);
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
-.wear__items li + li { margin-top: 0.2rem; }
+/* ---------- Выбор города ---------- */
 
-.wear__notes {
-  margin: 1.25rem 0 0;
-  padding: 0 0 0 1rem;
-  border-left: 3px solid var(--accent);
-  list-style: none;
+.picker { position: fixed; inset: 0; z-index: 50; }
+
+.picker__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(6, 14, 26, 0.45);
+  animation: fade-in 0.25s ease both;
 }
 
-.wear__notes li + li { margin-top: 0.4rem; }
-
-.footer {
-  margin-top: 4rem;
-  font-size: 0.8125rem;
-  color: var(--ink-soft);
+.picker__sheet {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: calc(var(--safe-top) + 40px);
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 18px 16px calc(24px + var(--safe-bottom));
+  border-radius: 28px 28px 0 0;
+  background: var(--bg);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  animation: sheet-in 0.35s var(--ease-out) both;
 }
 
-.footer a { color: inherit; }
+.picker__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.picker__title { font-family: var(--font-display); font-weight: 900; font-size: 1.5rem; margin: 0; }
+.picker__hint { margin: 14px 4px 0; color: var(--hint); }
+.picker__section { margin: 22px 4px 6px; font-size: 0.875rem; font-weight: 500; color: var(--hint); }
 
-/* ---------- Телефоны ---------- */
-
-@media (max-width: 30rem) {
-  .header { flex-direction: column; align-items: stretch; }
-  .search { max-width: none; }
-  .now__details { grid-template-columns: repeat(2, 1fr); }
-  .now__summary { padding-bottom: 0; }
-  .wear__items { font-size: 1.0625rem; }
+.plain-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--tile);
+  color: var(--hint);
 }
 
-/* Кнопки и ссылки удобно нажимать пальцем */
-@media (pointer: coarse) {
-  .link-btn { padding: 0.35rem 0; }
-  .search__option { padding: 0.75rem 0.7rem; }
+.field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 0 14px;
+  border-radius: 16px;
+  background: var(--tile);
+  color: var(--hint);
 }
+
+.field:focus-within { outline: 2px solid var(--accent); }
+
+.field__input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 1.0625rem;
+  outline: none;
+}
+
+.field__input::-webkit-search-cancel-button { display: none; }
+
+.row-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 52px;
+  margin-top: 10px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 16px;
+  background: none;
+  color: var(--link);
+  font-weight: 500;
+  text-align: left;
+}
+
+.row-btn:active { background: var(--tile); }
+.row-btn__icon { display: inline-grid; place-items: center; }
+
+.list { margin: 8px 0 0; padding: 0; list-style: none; }
+
+.list__item {
+  display: flex;
+  flex-direction: column;
+  padding: 11px 14px;
+  border-radius: 14px;
+  cursor: pointer;
+}
+
+.list__item.is-active, .list__item:hover { background: var(--tile); }
+
+.list__btn { width: 100%; border: 0; background: none; text-align: left; }
+.list__name { font-weight: 800; font-size: 1.0625rem; }
+.list__sub { font-size: 0.875rem; color: var(--hint); }
+
+/* ---------- Доступность ---------- */
 
 @media (prefers-reduced-motion: reduce) {
-  body { transition: none; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .scene * { animation: none !important; }
 }

@@ -1,65 +1,142 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import CitySearch, { cityLabel } from './components/CitySearch';
 import CurrentWeather from './components/CurrentWeather';
 import ClothingAdvice from './components/ClothingAdvice';
 import DayWish from './components/DayWish';
+import WeatherDetails from './components/WeatherDetails';
+import WeatherScene from './components/WeatherScene';
+import { LocateIcon, SearchIcon } from './components/Icons';
 import { useWeather } from './hooks/useWeather';
 import { useSavedCity } from './hooks/useSavedCity';
+import { useLocate } from './hooks/useLocate';
 import { skyTheme } from './utils/weatherCodes';
+import { SKY } from './utils/sky';
+import { haptic, openLink, setChromeColors } from './telegram';
 
 export default function App() {
-  const [city, setCity] = useSavedCity();
+  const { ready, city, recents, setCity } = useSavedCity();
   const { weather, status, updatedAt, refresh } = useWeather(city);
+  const [pickerOpen, setPickerOpen] = useState(false);
 
-  // Тема страницы следует за погодой
+  const selectCity = useCallback(
+    (c) => {
+      setCity(c);
+      setPickerOpen(false);
+    },
+    [setCity]
+  );
+  const geo = useLocate(selectCity);
+  const closePicker = useCallback(() => setPickerOpen(false), []);
+
+  const skyKey = weather ? skyTheme(weather.code, weather.isDay) : 'idle';
+  const sky = SKY[skyKey];
+
   useEffect(() => {
-    document.documentElement.dataset.sky = weather
-      ? skyTheme(weather.code, weather.isDay)
-      : 'idle';
-  }, [weather]);
+    setChromeColors(sky.top);
+  }, [sky.top]);
+
+  function openPicker() {
+    haptic.tap();
+    setPickerOpen(true);
+  }
+
+  function onRefresh() {
+    haptic.tap();
+    refresh();
+  }
+
+  const loading = city && status === 'loading' && !weather;
 
   return (
-    <main className="page">
-      <header className="header">
-        <h1 className="title">Что надеть</h1>
-        <CitySearch onSelect={setCity} />
-      </header>
-
-      {!city && (
-        <p className="empty">
-          Найдите свой город или определите местоположение — покажем погоду прямо сейчас,
-          подскажем, как одеться, и пожелаем хорошего дня.
-        </p>
-      )}
-
-      {city && status === 'loading' && !weather && (
-        <p className="empty" role="status">Загружаем погоду для {city.name}…</p>
-      )}
-
-      {status === 'error' && (
-        <p className="error" role="alert">
-          Не удалось загрузить погоду. Проверьте подключение к интернету и{' '}
-          <button type="button" className="link-btn" onClick={refresh}>попробуйте снова</button>.
-        </p>
-      )}
-
-      {weather && (
-        <>
+    <div className="app" data-sky={skyKey}>
+      <header
+        className="hero"
+        style={{
+          '--sky-top': sky.top,
+          '--sky-bottom': sky.bottom,
+          '--sky-ink': sky.ink,
+          '--sky-shadow': sky.shadow,
+        }}
+      >
+        <WeatherScene code={weather?.code} isDay={weather?.isDay ?? true} />
+        {city ? (
           <CurrentWeather
-            cityName={cityLabel(city)}
+            cityName={city.name}
             weather={weather}
             updatedAt={updatedAt}
-            onRefresh={refresh}
+            onPickCity={openPicker}
+            onRefresh={onRefresh}
             refreshing={status === 'loading'}
           />
-          <DayWish weather={weather} cityName={city.name} />
-          <ClothingAdvice weather={weather} />
-        </>
-      )}
+        ) : (
+          <div className="hero__content hero__content--welcome">
+            <p className="hero__brand">Что надеть</p>
+            <h1 className="hero__welcome">Какая погода у вас?</h1>
+          </div>
+        )}
+      </header>
 
-      <footer className="footer">
-        Данные: <a href="https://open-meteo.com/">Open-Meteo.com</a>
-      </footer>
-    </main>
+      <main className="sheet" key={city ? `${city.latitude},${city.longitude}` : 'empty'}>
+        {!ready && <p className="sheet__status">Загружаем…</p>}
+
+        {ready && !city && (
+          <section className="welcome">
+            <p className="welcome__text">
+              Покажем погоду прямо сейчас, подскажем, что надеть, и пожелаем хорошего дня.
+            </p>
+            <button
+              type="button"
+              className="primary-btn"
+              onClick={geo.locate}
+              disabled={geo.status === 'locating'}
+            >
+              <LocateIcon />
+              {geo.status === 'locating' ? 'Определяем…' : 'Моё местоположение'}
+            </button>
+            <button type="button" className="secondary-btn" onClick={openPicker}>
+              <SearchIcon />
+              Выбрать город
+            </button>
+            {geo.status === 'error' && (
+              <p className="notice" role="alert">
+                {geo.message}{' '}
+                {geo.canFix && (
+                  <button type="button" className="link-btn" onClick={geo.openSettings}>
+                    Открыть настройки
+                  </button>
+                )}
+              </p>
+            )}
+          </section>
+        )}
+
+        {loading && <p className="sheet__status" role="status">Загружаем погоду для {city.name}…</p>}
+
+        {status === 'error' && !weather && (
+          <div className="notice notice--block" role="alert">
+            <p>Не удалось загрузить погоду. Проверьте подключение к интернету.</p>
+            <button type="button" className="secondary-btn" onClick={onRefresh}>
+              Попробовать снова
+            </button>
+          </div>
+        )}
+
+        {weather && (
+          <>
+            <DayWish weather={weather} cityName={city.name} />
+            <ClothingAdvice weather={weather} />
+            <WeatherDetails weather={weather} />
+            <p className="credit">
+              {cityLabel(city)}. Данные{' '}
+              <button type="button" className="link-btn" onClick={() => openLink('https://open-meteo.com/')}>
+                Open-Meteo
+              </button>
+            </p>
+          </>
+        )}
+      </main>
+
+      <CitySearch open={pickerOpen} onClose={closePicker} onSelect={selectCity} recents={recents} />
+    </div>
   );
 }
