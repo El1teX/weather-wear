@@ -1,14 +1,22 @@
 import { getDayWish } from '../utils/wishes';
 
+const GREETING_EMOJI = {
+  'Доброе утро': '🌅',
+  'Добрый день': '👋',
+  'Добрый вечер': '🌆',
+  'Доброй ночи': '🌙',
+};
+
 export default function DayWish({ weather, cityName }) {
   const { greeting, text } = getDayWish(weather, cityName);
 
   return (
-    <section className="wish" aria-labelledby="wish-title">
-      <h2 id="wish-title" className="wish__label">Пожелание на день</h2>
-      <p className="wish__text">
-        <span className="wish__greeting">{greeting}!</span> {text}
+    <section className="wish" aria-label="Пожелание на день">
+      <p className="wish__greeting">
+        <span className="wish__emoji" aria-hidden="true">{GREETING_EMOJI[greeting]}</span>
+        {greeting}!
       </p>
+      <p className="wish__text">{text}</p>
     </section>
   );
 }
