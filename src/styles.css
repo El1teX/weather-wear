@@ -93,6 +93,15 @@ body {
 
 .search__hint--error { position: static; display: block; margin-top: 0.4rem; }
 
+.search__geo {
+  display: inline-block;
+  margin-top: 0.6rem;
+  font-size: 0.875rem;
+  color: var(--ink-soft);
+}
+
+.search__geo:hover:not(:disabled) { color: var(--ink); }
+
 .search__list {
   position: absolute;
   z-index: 10;
@@ -204,6 +213,33 @@ a:focus-visible {
   border-radius: 2px;
 }
 
+/* ---------- Пожелание на день ---------- */
+
+.wish {
+  margin-top: clamp(2.5rem, 7vw, 3.5rem);
+  max-width: 36rem;
+}
+
+.wish__label {
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: var(--ink-soft);
+  margin: 0 0 0.5rem;
+}
+
+.wish__text {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(1.25rem, 3.6vw, 1.625rem);
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+  margin: 0;
+  text-wrap: pretty;
+}
+
+.wish__greeting { font-weight: 500; }
+
 /* ---------- Что надеть ---------- */
 
 .wear { margin-top: clamp(3rem, 8vw, 4.5rem); }
@@ -266,6 +302,22 @@ a:focus-visible {
 }
 
 .footer a { color: inherit; }
+
+/* ---------- Телефоны ---------- */
+
+@media (max-width: 30rem) {
+  .header { flex-direction: column; align-items: stretch; }
+  .search { max-width: none; }
+  .now__details { grid-template-columns: repeat(2, 1fr); }
+  .now__summary { padding-bottom: 0; }
+  .wear__items { font-size: 1.0625rem; }
+}
+
+/* Кнопки и ссылки удобно нажимать пальцем */
+@media (pointer: coarse) {
+  .link-btn { padding: 0.35rem 0; }
+  .search__option { padding: 0.75rem 0.7rem; }
+}
 
 @media (prefers-reduced-motion: reduce) {
   body { transition: none; }

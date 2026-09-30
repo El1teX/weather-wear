@@ -1,12 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import CitySearch, { cityLabel } from './components/CitySearch';
 import CurrentWeather from './components/CurrentWeather';
 import ClothingAdvice from './components/ClothingAdvice';
+import DayWish from './components/DayWish';
 import { useWeather } from './hooks/useWeather';
+import { useSavedCity } from './hooks/useSavedCity';
 import { skyTheme } from './utils/weatherCodes';
 
 export default function App() {
-  const [city, setCity] = useState(null);
+  const [city, setCity] = useSavedCity();
   const { weather, status, updatedAt, refresh } = useWeather(city);
 
   // Тема страницы следует за погодой
@@ -25,7 +27,8 @@ export default function App() {
 
       {!city && (
         <p className="empty">
-          Найдите свой город — покажем погоду прямо сейчас и подскажем, как одеться.
+          Найдите свой город или определите местоположение — покажем погоду прямо сейчас,
+          подскажем, как одеться, и пожелаем хорошего дня.
         </p>
       )}
 
@@ -49,6 +52,7 @@ export default function App() {
             onRefresh={refresh}
             refreshing={status === 'loading'}
           />
+          <DayWish weather={weather} cityName={city.name} />
           <ClothingAdvice weather={weather} />
         </>
       )}
