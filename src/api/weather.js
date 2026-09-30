@@ -82,3 +82,39 @@ export async function fetchWeather({ latitude, longitude }, signal) {
     },
   };
 }
+
+const REVERSE_URL = 'https://api.bigdatacloud.net/data/reverse-geocode-client';
+
+/**
+ * Название места по координатам. Нужно для геолокации:
+ * у Open-Meteo нет обратного геокодирования, поэтому используем
+ * бесплатный клиентский API BigDataCloud (без ключа).
+ */
+export async function reverseGeocode({ latitude, longitude }, signal) {
+  const base = {
+    id: `geo-${latitude.toFixed(3)}-${longitude.toFixed(3)}`,
+    name: 'Моё местоположение',
+    latitude,
+    longitude,
+  };
+  try {
+    const params = new URLSearchParams({
+      latitude: String(latitude),
+      longitude: String(longitude),
+      localityLanguage: 'ru',
+    });
+    const res = await fetch(`${REVERSE_URL}?${params}`, { signal });
+    if (!res.ok) return base;
+    const d = await res.json();
+    return {
+      ...base,
+      name: d.city || d.locality || base.name,
+      admin1: d.principalSubdivision || undefined,
+      country: d.countryName || undefined,
+    };
+  } catch (e) {
+    if (e.name === 'AbortError') throw e;
+    // Название не определилось — погоду всё равно показываем по координатам.
+    return base;
+  }
+}
