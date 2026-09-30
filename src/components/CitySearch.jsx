@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState } from 'react';
-import { searchCities } from '../api/weather';
+import { reverseGeocode, searchCities } from '../api/weather';
 
 const DEBOUNCE_MS = 350;
 
@@ -15,8 +15,10 @@ export default function CitySearch({ onSelect }) {
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(-1);
   const [status, setStatus] = useState('idle'); // idle | loading | empty | error
+  const [geo, setGeo] = useState({ status: 'idle', message: '' }); // idle | locating | error
   const listId = useId();
   const wrapRef = useRef(null);
+  const geoSupported = typeof navigator !== 'undefined' && 'geolocation' in navigator;
 
   useEffect(() => {
     const q = query.trim();
@@ -57,6 +59,28 @@ export default function CitySearch({ onSelect }) {
     setQuery('');
     setResults([]);
     setOpen(false);
+  }
+
+  function locate() {
+    setGeo({ status: 'locating', message: '' });
+    navigator.geolocation.getCurrentPosition(
+      async ({ coords }) => {
+        const city = await reverseGeocode({
+          latitude: coords.latitude,
+          longitude: coords.longitude,
+        });
+        setGeo({ status: 'idle', message: '' });
+        choose(city);
+      },
+      (err) => {
+        const message =
+          err.code === err.PERMISSION_DENIED
+            ? 'Доступ к местоположению запрещён. Разрешите его в настройках браузера или найдите город вручную.'
+            : 'Не удалось определить местоположение. Найдите город вручную.';
+        setGeo({ status: 'error', message });
+      },
+      { timeout: 10000, maximumAge: 10 * 60 * 1000 }
+    );
   }
 
   function onKeyDown(e) {
@@ -102,6 +126,19 @@ export default function CitySearch({ onSelect }) {
         <span className="search__hint search__hint--error">
           Поиск недоступен. Проверьте подключение к интернету.
         </span>
+      )}
+      {geoSupported && (
+        <button
+          type="button"
+          className="link-btn search__geo"
+          onClick={locate}
+          disabled={geo.status === 'locating'}
+        >
+          {geo.status === 'locating' ? 'Определяем местоположение…' : 'Определить моё местоположение'}
+        </button>
+      )}
+      {geo.status === 'error' && (
+        <span className="search__hint search__hint--error" role="alert">{geo.message}</span>
       )}
       {showList && (
         <ul className="search__list" id={listId} role="listbox">
