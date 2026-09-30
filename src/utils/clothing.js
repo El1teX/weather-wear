@@ -138,7 +138,7 @@ export function getClothingAdvice(weather) {
       if (i >= 0) extras[i] = hat;
       else extras.unshift(hat);
     }
-    notes.push(`Сильный ветер: ${Math.round(wind)} м/с, порывы до ${Math.round(gusts)} м/с.`);
+    notes.push(`Сильный ветер: ${Math.round(wind)}\u00a0м/с, порывы до ${Math.round(gusts)}\u00a0м/с.`);
   }
 
   // Солнце
