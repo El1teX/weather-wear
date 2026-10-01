@@ -51,9 +51,11 @@ export async function fetchWeather({ latitude, longitude }, signal) {
       'sunrise',
       'sunset',
     ].join(','),
+    hourly: ['temperature_2m', 'weather_code', 'precipitation_probability', 'is_day'].join(','),
     wind_speed_unit: 'ms',
     timezone: 'auto',
-    forecast_days: '1',
+    // Два дня, чтобы почасовой прогноз на 24 часа переходил через полночь
+    forecast_days: '2',
   });
 
   const res = await fetch(`${FORECAST_URL}?${params}`, { signal });
@@ -61,6 +63,18 @@ export async function fetchWeather({ latitude, longitude }, signal) {
   const d = await res.json();
   const c = d.current;
   const day = d.daily;
+  const h = d.hourly;
+
+  // Почасовой прогноз: 24 часа начиная с текущего
+  const hourKey = `${c.time.slice(0, 13)}:00`;
+  const start = Math.max(0, h.time.indexOf(hourKey));
+  const hourly = h.time.slice(start, start + 24).map((time, i) => ({
+    time,
+    temp: h.temperature_2m[start + i],
+    code: h.weather_code[start + i],
+    pop: h.precipitation_probability[start + i] ?? 0,
+    isDay: h.is_day[start + i] === 1,
+  }));
 
   return {
     time: c.time,
@@ -80,6 +94,7 @@ export async function fetchWeather({ latitude, longitude }, signal) {
       sunrise: day.sunrise[0],
       sunset: day.sunset[0],
     },
+    hourly,
   };
 }
 
