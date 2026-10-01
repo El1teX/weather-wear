@@ -3,6 +3,7 @@ import CitySearch, { cityLabel } from './components/CitySearch';
 import CurrentWeather from './components/CurrentWeather';
 import ClothingAdvice from './components/ClothingAdvice';
 import DayWish from './components/DayWish';
+import HourlyForecast from './components/HourlyForecast';
 import WeatherDetails from './components/WeatherDetails';
 import WeatherScene from './components/WeatherScene';
 import { LocateIcon, SearchIcon } from './components/Icons';
@@ -124,6 +125,7 @@ export default function App() {
         {weather && (
           <>
             <DayWish weather={weather} cityName={city.name} />
+            <HourlyForecast weather={weather} />
             <ClothingAdvice weather={weather} />
             <WeatherDetails weather={weather} />
             <p className="credit">

@@ -326,6 +326,60 @@ button:disabled { cursor: default; }
 
 .block__lead { margin: 4px 0 0; color: var(--hint); }
 
+/* По часам */
+.hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0 0;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 0.9375rem;
+}
+
+.hint--good { background: color-mix(in srgb, #2fc79a 18%, var(--bg)); }
+.hint--warn { background: color-mix(in srgb, #4d9dff 20%, var(--bg)); }
+
+.hours {
+  display: flex;
+  gap: 8px;
+  margin: 14px -20px 0;
+  padding: 2px 20px 8px;
+  list-style: none;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.hours::-webkit-scrollbar { display: none; }
+
+.hour {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 68px;
+  padding: 12px 8px 10px;
+  border-radius: 22px;
+  background: var(--tile);
+  scroll-snap-align: start;
+  animation: chip-in 0.5s calc(0.25s + var(--i, 0) * 50ms) var(--spring) both;
+}
+
+.hour--now {
+  background: color-mix(in srgb, var(--accent) 22%, var(--bg));
+  box-shadow: inset 0 0 0 2px var(--accent);
+}
+
+.hour__time { font-size: 0.8125rem; font-weight: 800; color: var(--hint); }
+.hour--now .hour__time { color: var(--accent); }
+.hour__temp { font-weight: 900; font-size: 1.125rem; }
+.hour__pop { font-size: 0.75rem; font-weight: 800; color: #3d8fe0; min-height: 1em; }
+.hour__pop.is-empty { color: var(--hint); opacity: 0.5; }
+
 /* Что надеть */
 .outfit { display: grid; gap: 16px; margin-top: 16px; }
 .outfit__label { margin: 0 0 8px; font-size: 0.9375rem; font-weight: 800; color: var(--hint); }
