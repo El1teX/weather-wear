@@ -6,6 +6,7 @@ import DayWish from './components/DayWish';
 import HourlyForecast from './components/HourlyForecast';
 import WeatherDetails from './components/WeatherDetails';
 import WeatherScene from './components/WeatherScene';
+import Mascot from './components/Mascot';
 import { LocateIcon, SearchIcon } from './components/Icons';
 import { useWeather } from './hooks/useWeather';
 import { useSavedCity } from './hooks/useSavedCity';
@@ -60,6 +61,7 @@ export default function App() {
         }}
       >
         <WeatherScene code={weather?.code} isDay={weather?.isDay ?? true} />
+        {ready && (!city || weather) && <Mascot weather={weather} />}
         {city ? (
           <CurrentWeather
             cityName={city.name}
