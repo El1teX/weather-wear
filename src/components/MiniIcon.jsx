@@ -25,12 +25,12 @@ function Sun({ cx = 22, cy = 22, r = 9 }) {
   );
 }
 
-function Moon({ cx = 22, cy = 20 }) {
+function Moon({ cx = 22, cy = 22, r = 13 }) {
   return (
     <g>
-      <circle cx={cx} cy={cy} r={10} fill="#FFF1B8" stroke={OUTLINE} strokeWidth={2} />
-      <circle cx={cx - 3} cy={cy - 3} r={2} fill="#F2DE8C" />
-      <circle cx={cx + 4} cy={cy + 3} r={1.5} fill="#F2DE8C" />
+      <circle cx={cx} cy={cy} r={r} fill="#FFF1B8" stroke={OUTLINE} strokeWidth={2} />
+      <path d={`M${cx - 7} ${cy - 1}q2.5 2.5 5 0M${cx + 2} ${cy - 1}q2.5 2.5 5 0`} fill="none" stroke={OUTLINE} strokeWidth={1.6} strokeLinecap="round" />
+      <path d={`M${cx - 2.5} ${cy + 4.5}q2.5 2 5 0`} fill="none" stroke={OUTLINE} strokeWidth={1.6} strokeLinecap="round" />
     </g>
   );
 }
@@ -107,7 +107,7 @@ export default function MiniIcon({ code, isDay, size = 40 }) {
   } else if (code === 1 || code === 2) {
     body = (
       <>
-        {isDay ? <Sun cx={17} cy={16} r={8} /> : <Moon cx={17} cy={15} />}
+        {isDay ? <Sun cx={17} cy={16} r={8} /> : <Moon cx={17} cy={15} r={10} />}
         <Cloud x={6} y={12} scale={0.82} />
       </>
     );
