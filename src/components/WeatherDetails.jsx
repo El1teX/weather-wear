@@ -50,7 +50,9 @@ export default function WeatherDetails({ weather }) {
 
   return (
     <section className="block" aria-labelledby="details-title">
-      <h2 id="details-title" className="block__title">Подробнее</h2>
+      <h2 id="details-title" className="block__title">
+        <span aria-hidden="true">📊</span> Подробнее
+      </h2>
       <div className="tiles">
         <div className="tile" data-tone="wind">
           <span className="tile__emoji" aria-hidden="true">💨</span>

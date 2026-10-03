@@ -9,7 +9,9 @@ export default function ClothingAdvice({ weather }) {
 
   return (
     <section className="block" aria-labelledby="wear-title">
-      <h2 id="wear-title" className="block__title">Что надеть</h2>
+      <h2 id="wear-title" className="block__title">
+        <span aria-hidden="true">👕</span> Что надеть
+      </h2>
       <p className="block__lead">
         Ощущается как {signed(advice.feelsLike)}°: {advice.title.toLowerCase()}.
       </p>
