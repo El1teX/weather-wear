@@ -7,10 +7,12 @@ import HourlyForecast from './components/HourlyForecast';
 import WeatherDetails from './components/WeatherDetails';
 import WeatherScene from './components/WeatherScene';
 import Mascot from './components/Mascot';
+import PetPicker from './components/PetPicker';
 import { LocateIcon, SearchIcon } from './components/Icons';
 import { useWeather } from './hooks/useWeather';
 import { useSavedCity } from './hooks/useSavedCity';
 import { useLocate } from './hooks/useLocate';
+import { usePet } from './hooks/usePet';
 import { skyTheme } from './utils/weatherCodes';
 import { SKY } from './utils/sky';
 import { haptic, openLink, setChromeColors } from './telegram';
@@ -19,6 +21,7 @@ export default function App() {
   const { ready, city, recents, setCity } = useSavedCity();
   const { weather, status, updatedAt, refresh } = useWeather(city);
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [pet, setPet] = usePet();
 
   const selectCity = useCallback(
     (c) => {
@@ -35,7 +38,9 @@ export default function App() {
 
   useEffect(() => {
     setChromeColors(sky.top);
-  }, [sky.top]);
+    // Цвет фона страницы на широком экране — в тон неба
+    document.documentElement.style.setProperty('--page-sky', sky.bottom);
+  }, [sky.top, sky.bottom]);
 
   function openPicker() {
     haptic.tap();
@@ -61,7 +66,7 @@ export default function App() {
         }}
       >
         <WeatherScene code={weather?.code} isDay={weather?.isDay ?? true} />
-        {ready && (!city || weather) && <Mascot weather={weather} />}
+        {ready && (!city || weather) && <Mascot weather={weather} pet={pet} />}
         {city ? (
           <CurrentWeather
             cityName={city.name}
@@ -113,6 +118,8 @@ export default function App() {
           </section>
         )}
 
+        {ready && !city && <PetPicker pet={pet} onChange={setPet} />}
+
         {loading && <p className="sheet__status" role="status">Загружаем погоду для {city.name}…</p>}
 
         {status === 'error' && !weather && (
@@ -130,6 +137,7 @@ export default function App() {
             <HourlyForecast weather={weather} />
             <ClothingAdvice weather={weather} />
             <WeatherDetails weather={weather} />
+            <PetPicker pet={pet} onChange={setPet} />
             <p className="credit">
               {cityLabel(city)}. Данные{' '}
               <button type="button" className="link-btn" onClick={() => openLink('https://open-meteo.com/')}>

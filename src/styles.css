@@ -164,16 +164,16 @@ button:disabled { cursor: default; }
   max-width: 11ch;
 }
 
-/* ---------- Талисман Пончик ---------- */
+/* ---------- Спутник (лиса, енот, обезьяна) ---------- */
 
-.hero__now { padding-right: 104px; }
+.hero__now { padding-right: 112px; }
 
 .mascot {
   position: absolute;
   z-index: 3;
-  right: 8px;
-  bottom: 26px;
-  width: 122px;
+  right: 6px;
+  bottom: 24px;
+  width: 124px;
 }
 
 .mascot__btn {
@@ -182,61 +182,58 @@ button:disabled { cursor: default; }
   padding: 0;
   border: 0;
   background: none;
+  cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
 
-.mascot__btn > span { display: block; transform-origin: 50% 100%; }
+.mascot__btn:focus-visible { outline-offset: -4px; border-radius: 24px; }
+
+.mascot__move { display: block; transform-origin: 50% 100%; }
 .mascot__svg { display: block; width: 100%; height: auto; overflow: visible; }
 
-.mascot__enter { animation: mascot-enter 0.8s 0.4s var(--spring) both; }
-.mascot__jump { animation: mascot-jump 0.6s var(--spring); }
+.mascot__move.is-enter { animation: pet-enter 0.8s 0.4s var(--spring) both; }
+.mascot__move.is-jump { animation: pet-jump 0.9s var(--spring); }
+.mascot__move.is-run { animation: pet-run 2.2s ease-in-out; }
+.mascot__move.is-run .mascot__svg { animation: pet-run-bob 0.22s ease-in-out infinite alternate; }
+.mascot__move.is-run .pet__foot--l { animation: pet-step 0.22s ease-in-out infinite alternate; }
+.mascot__move.is-run .pet__foot--r { animation: pet-step 0.22s ease-in-out infinite alternate-reverse; }
+.mascot__move.is-run .pet__wave { animation: none; }
 
-.mascot__breathe { transform-box: fill-box; transform-origin: 50% 100%; animation: breathe 2.4s ease-in-out infinite; }
-.mascot__blink { transform-box: fill-box; transform-origin: center; animation: blink 4s ease-in-out infinite; }
-.mascot__wave { transform-box: fill-box; transform-origin: 20% 90%; animation: wave-arm 2.8s ease-in-out infinite; }
-.mascot__umbrella { transform-box: view-box; transform-origin: 100px 104px; animation: umbrella 3s ease-in-out infinite alternate; }
-.mascot__sway { transform-box: fill-box; transform-origin: 20% 100%; animation: umbrella 3.4s ease-in-out infinite alternate; }
-.mascot__sweat { animation: sweat 1.8s ease-in infinite; }
+.pet__foot { transform-box: fill-box; transform-origin: center; }
+.pet__breathe { transform-box: fill-box; transform-origin: 50% 100%; animation: breathe 2.4s ease-in-out infinite; }
+.pet__blink { transform-box: fill-box; transform-origin: center; animation: blink 4s ease-in-out infinite; }
+.pet__wave { transform-box: fill-box; transform-origin: 20% 90%; animation: wave-arm 2.8s ease-in-out infinite; }
+.pet__tail { transform-box: fill-box; transform-origin: 90% 90%; animation: tail-wag 1.6s ease-in-out infinite alternate; }
+.pet__umbrella { transform-box: view-box; transform-origin: 92px 110px; animation: umbrella 3s ease-in-out infinite alternate; }
+.pet__sway { transform-box: fill-box; transform-origin: 20% 100%; animation: umbrella 3.4s ease-in-out infinite alternate; }
+.pet__sweat { animation: sweat 1.8s ease-in infinite; }
 .mascot--shiver .mascot__svg { animation: shiver 0.25s linear infinite; }
 
-.mascot__bubble {
-  position: absolute;
-  right: 6px;
-  bottom: calc(100% + 4px);
-  width: max-content;
-  max-width: 190px;
-  margin: 0;
-  padding: 9px 13px;
-  border: 2.5px solid #27304a;
-  border-radius: 18px 18px 4px 18px;
-  background: #ffffff;
-  color: #1a2440;
-  font-size: 0.9375rem;
-  font-weight: 800;
-  line-height: 1.3;
-  text-shadow: none;
-  opacity: 0;
-  transform: translateY(8px) scale(0.85);
-  transform-origin: 90% 100%;
-  transition: opacity 0.2s, transform 0.35s var(--spring);
-  pointer-events: none;
-}
-
-.mascot__bubble.is-visible { opacity: 1; transform: none; }
-
-@keyframes mascot-enter {
+@keyframes pet-enter {
   from { opacity: 0; transform: translateY(40px) scale(0.6); }
   to { opacity: 1; transform: none; }
 }
-@keyframes mascot-jump {
-  0% { transform: scale(1, 1); }
-  20% { transform: scale(1.12, 0.86); }
-  50% { transform: translateY(-26px) scale(0.94, 1.08); }
-  80% { transform: translateY(0) scale(1.06, 0.94); }
+@keyframes pet-jump {
+  0% { transform: none; }
+  15% { transform: scale(1.14, 0.84); }
+  45% { transform: translateY(-70px) scale(0.92, 1.1) rotate(-8deg); }
+  60% { transform: translateY(-70px) scale(0.95, 1.05) rotate(8deg); }
+  82% { transform: translateY(0) scale(1.1, 0.9); }
   100% { transform: none; }
 }
+@keyframes pet-run {
+  0% { transform: translateX(0) scaleX(1); }
+  6% { transform: translateX(8px) scaleX(1); }
+  44% { transform: translateX(-240px) scaleX(1); }
+  50% { transform: translateX(-240px) scaleX(-1); }
+  94% { transform: translateX(0) scaleX(-1); }
+  100% { transform: translateX(0) scaleX(1); }
+}
+@keyframes pet-run-bob { from { transform: translateY(0) rotate(-3deg); } to { transform: translateY(-8px) rotate(3deg); } }
+@keyframes pet-step { from { transform: translateY(0); } to { transform: translateY(-7px) rotate(-12deg); } }
 @keyframes breathe { 0%, 100% { transform: scale(1, 1); } 50% { transform: scale(1.025, 0.975); } }
 @keyframes wave-arm { 0%, 60%, 100% { transform: rotate(0); } 70%, 90% { transform: rotate(-22deg); } 80% { transform: rotate(8deg); } }
+@keyframes tail-wag { from { transform: rotate(-6deg); } to { transform: rotate(6deg); } }
 @keyframes umbrella { from { transform: rotate(-5deg); } to { transform: rotate(5deg); } }
 @keyframes sweat {
   0% { opacity: 0; transform: translateY(-4px); }
@@ -244,6 +241,46 @@ button:disabled { cursor: default; }
   100% { opacity: 0; transform: translateY(10px); }
 }
 @keyframes shiver { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-1px); } 75% { transform: translateX(1px); } }
+
+/* Выбор спутника */
+.pets { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
+
+.pet-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 6px 10px;
+  border: 2px solid transparent;
+  border-radius: 22px;
+  background: var(--tile);
+  transition: transform 0.35s var(--spring), border-color 0.2s, background-color 0.2s;
+}
+
+.pet-card:active { transform: scale(0.94); }
+.pet-card:hover { border-color: color-mix(in srgb, var(--accent) 40%, transparent); }
+.pet-card.is-selected { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, var(--bg)); }
+.pet-card__art { width: 72px; height: auto; }
+.pet-card.is-selected .pet-card__art { animation: pet-pick 0.5s var(--spring); }
+.pet-card__name { font-weight: 800; font-size: 0.9375rem; }
+
+.pet-card__check {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 0.8125rem;
+  font-weight: 900;
+}
+
+@keyframes pet-pick { 0% { transform: scale(1); } 40% { transform: translateY(-10px) scale(1.08); } 100% { transform: none; } }
 
 /* ---------- Сцена (объекты неба) ---------- */
 
@@ -362,7 +399,12 @@ button:disabled { cursor: default; }
 .sheet__status { margin: 8px 0; color: var(--hint); font-size: 1.0625rem; }
 
 /* Пожелание */
-.wish { margin-bottom: 30px; }
+.wish {
+  margin-bottom: 32px;
+  padding: 16px 18px 18px;
+  border-radius: 24px;
+  background: color-mix(in srgb, var(--accent) 11%, var(--bg));
+}
 .wish__greeting {
   display: flex;
   align-items: center;
@@ -407,6 +449,28 @@ button:disabled { cursor: default; }
 
 .block__lead { margin: 4px 0 0; color: var(--hint); }
 
+.block__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.block__title span { display: inline-block; margin-right: 2px; font-size: 1.25rem; vertical-align: 1px; }
+
+.scroll-btns { display: none; gap: 6px; }
+
+.scroll-btn {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--tile);
+  color: var(--ink);
+  transition: transform 0.3s var(--spring), opacity 0.2s;
+}
+
+.scroll-btn:hover:not(:disabled) { background: color-mix(in srgb, var(--accent) 18%, var(--tile)); }
+.scroll-btn:active:not(:disabled) { transform: scale(0.88); }
+.scroll-btn:disabled { opacity: 0.35; cursor: default; }
+
 /* По часам */
 .hint {
   display: inline-flex;
@@ -430,11 +494,28 @@ button:disabled { cursor: default; }
   list-style: none;
   overflow-x: auto;
   scroll-snap-type: x proximity;
+  scroll-padding-inline: 20px;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
 }
 
 .hours::-webkit-scrollbar { display: none; }
+.hours:focus-visible { outline-offset: -2px; border-radius: 22px; }
+.hours.is-dragging { cursor: grabbing; scroll-snap-type: none; user-select: none; }
+
+/* Компьютер с мышью: стрелки, видимая полоса прокрутки, курсор «рука» */
+@media (hover: hover) and (pointer: fine) {
+  .scroll-btns { display: flex; }
+  .hours {
+    cursor: grab;
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--hint) 45%, transparent) transparent;
+    padding-bottom: 12px;
+  }
+  .hours::-webkit-scrollbar { display: block; height: 6px; }
+  .hours::-webkit-scrollbar-thumb { border-radius: 3px; background: color-mix(in srgb, var(--hint) 45%, transparent); }
+  .hour { user-select: none; }
+}
 
 .hour {
   flex: 0 0 auto;
@@ -709,6 +790,23 @@ button:disabled { cursor: default; }
 .list__btn { width: 100%; border: 0; background: none; text-align: left; }
 .list__name { font-weight: 800; font-size: 1.0625rem; }
 .list__sub { font-size: 0.875rem; color: var(--hint); }
+
+/* ---------- Широкий экран ---------- */
+
+html { background: var(--bg); transition: background-color 1.2s ease; }
+
+@media (min-width: 640px) {
+  html:not(.in-telegram) { background: var(--page-sky, var(--bg)); }
+  html:not(.in-telegram) body { background: transparent; padding: 28px 16px; }
+  html:not(.in-telegram) .app {
+    min-height: calc(100vh - 56px);
+    border-radius: 36px;
+    overflow: hidden;
+    background: var(--bg);
+    box-shadow: 0 30px 80px -30px rgba(10, 20, 50, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  }
+  html:not(.in-telegram) .hero { min-height: 440px; }
+}
 
 /* ---------- Доступность ---------- */
 
