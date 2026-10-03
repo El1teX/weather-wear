@@ -25,6 +25,8 @@ jobs:
         with:
           node-version: 20
       - run: npm install
+      # Если тесты не прошли, сайт не публикуется
+      - run: npm test
       - run: npm run build
       - uses: actions/upload-pages-artifact@v3
         with:
